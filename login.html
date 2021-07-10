@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>    
+    <title>Login</title>
+ 
+    <style>
+        .button {
+          background-color: #1c5a9a; /* Green */
+          border: none;
+          color: white;
+          padding: 8px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          margin: 0px 1px;
+          cursor: pointer;
+        }
+        
+        .button3 {width: 100%;}
+
+        </style>
+
+
+</head>
+<body>
+
+    <div class="container col-lg-4">
+        <h2 class="text-center font-weight-bold"><img src="Images/images.png" /></h2>
+        <form id="loginForm" class="pt-3">
+            <div class="form-group">
+                <input type="email" class="form-control" name="email" placeholder="Email" required/>
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+              </div>
+        <br/>
+        <form action="allpayment.html" id="getPayment" class="pt-3">
+               <input type="submit" class="button button3" id="b" value="Log In" >
+          </form>
+
+      </div>
+
+
+
+</body>
+<script>
+        $('#loginForm').submit(function(e){
+        e.preventDefault();
+
+        var userEmail = $("input[name = email]").val();
+        var userPassword = $("input[name = password]").val();
+
+        $.ajax({
+            type: "POST",
+            //url : "http://127.0.0.1:8000/api/login",
+            url: "http://192.168.1.6:8280/user/login",
+            data: {
+                email: userEmail,
+                password: userPassword,
+
+            },
+            jsonpCallback: "onJSONPLoad",
+		    dataType: "json",
+            success: function(response){
+                alert("sucess");
+                console.log(response);
+                localStorage.setItem("token", response.token);
+                localStorage.setItem("user_id" , response.user.id);
+                localStorage.setItem("user_name" , response.user.name);
+                window.location.href = "index.html";
+            },
+            error: function(data){
+                alert("Unsuccess");
+                console.log(data.message)
+            }
+        });
+    });
+</script>
+</html>

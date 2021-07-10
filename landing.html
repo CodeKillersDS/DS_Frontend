@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <title>Welcome</title>
+     <style>
+
+        .ex1 {      
+            padding-top: 80px;
+        }
+
+        .thick {
+            font-weight: bold;
+            color: red;
+        }
+
+        .he{
+          color:saddlebrown;
+        }
+
+     </style>
+    
+</head>
+<body onload="getItems()">
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="login.html"><div class="thick">LOGIN</div></a>
+      <form class="d-flex" id="searchProduct">
+        <input class="form-control me-2" type="search" placeholder="Search Product" id="name" name="name" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+      <a class="navbar-brand" href="register.html"><div class="thick">REGISTER</div></a>
+    </div>
+  </nav>
+
+
+   <!--- <div class="split left"> 
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a> -->
+
+        <div class="ex1">
+        <div class="row">
+          <div class="col-md-7">
+      <div class="container col-lg-6">
+            <h2><center><div class="he"> Items </div></center></h2>
+            <hr>
+            <table class = "table"  id='userTable'>
+              <thead class = "thead-dark">
+                 <tr>
+                   <th>name</th>
+                   <th>desc</th>
+                   <th>price</th>
+                   <th>action</th>
+                 </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+
+        </div>
+        </div>
+        
+   <!-- </div> -->
+
+    <!--<div class="split right"> 
+        <div class="centered"> -->
+
+          <div class="row">
+            <div class="col-md-7">
+            <h2><center><div class="he"> Cart </div></center></h2>
+            <hr>
+            <div id="itemOrderList">
+          
+            </div>
+      
+            <div id="totalPrice">
+      
+            </div>
+            <div id="deliverOrderLink">
+
+            </div>
+            <input type="button" class="btn btn-warning" value="Clear All" onclick="clearAll()"> <br/> <br/>
+          </form> 
+            <div class="col-auto">
+            <a href="payment.html">
+              <img src="Images/card.png" alt="my picture" height="80" width="80" /> 
+            </a> Card Payment
+
+            <a href="mobilepayment.html">
+              <img src="Images/mobile.png" alt="my picture" height="75" width="75" />
+            </a> Mobile Payment
+
+        <!--   <a href="payment.html">Payment via Card</a>
+            <a href="">Payment via Phone Number</a> --> 
+        </div>
+        </div>
+      </div>
+    </div>
+
+   <!--  </div> -->
+
+
+
+</body>
+<script>
+
+    var prices = 0;
+    window.itemLis; 
+
+    function getItems(){
+        $.ajax({
+            type : "GET",
+            //url : "http://127.0.0.1:8000/api/products",
+            url : "http://192.168.1.6:8280/user/products",
+            dataType : "json",
+            success: function(response){
+                var item = response.item;
+                response.forEach((i) => {
+                    
+                    var result_str = "<tr>" +
+                        "<td id='itemName' align = 'center'>" + i.name + "</td>" + 
+                        "<td id='itemDesc' align = 'center'>" + i.description + "</td>" + 
+                        "<td id='itemPrice' align = 'center'>" + i.price + "</td>" +
+                        "<td align = 'center'><form id='getItem'><input type='button' value='Add to Cart' onclick='getItem("+i.id+")' /></form></td>"
+                    "</tr>";  
+                    $('#userTable tbody').append(result_str);
+                    });
+
+            },
+            error: function(){
+                alert("something went wrong ! ");
+            }
+        });
+    }
+
+    function getItem(id){  
+        
+        $.ajax({
+            type:"GET",
+           // url : "http://127.0.0.1:8000/api/products/cart/" + id ,
+            url: "http://192.168.1.6:8280/user/products/cart" + id,
+            dataType : "json",
+            success : function(response){
+                console.log(response);
+
+                localStorage.setItem("itemName", response.name);
+                localStorage.setItem("itemPrice", response.price);
+
+                var price = localStorage.getItem("itemPrice");
+                prices = prices +  parseInt(price);
+
+                document.getElementById("totalPrice").innerHTML = "Total : " + prices;
+ 
+                var listView = document.getElementById("itemOrderList");
+                var newDiv = document.createElement('div');
+                newDiv.innerHTML ="Item : " + response.name + " | Price : " + response.price + "<br/>";
+                listView.append(newDiv);
+            
+            },
+            error: function(){
+
+            }
+        });
+
+    }
+
+    function clearAll(){
+        location.reload();
+    }
+
+    $('#searchProduct').submit(function(e) {
+    e.preventDefault();
+
+    //identify the input name
+    var name = $("input[name = name]").val();
+
+    $.ajax({
+        type : "GET", 
+        //url : "http://127.0.0.1:8000/api/products/search/" + name,
+        url : "http://192.168.1.6:8280/user/products/search/" + name,
+
+        success: function(response){
+            alert("data retrieved");
+                response.forEach((i) => {
+                    
+                    var result_str = "<tr>" +
+                        "<td id='itemName' align = 'center'>" + i.name + "</td>" + 
+                        "<td id='itemDesc' align = 'center'>" + i.description + "</td>" + 
+                        "<td id='itemPrice' align = 'center'>" + i.price + "</td>" +
+                        "<td align = 'center'><form id='getItem'><input type='button' value='Add to Cart' onclick='getItem("+i.id+")' /></form></td>"
+                    "</tr>";  
+                    $('#userTable tbody').html(result_str);
+            });
+        },
+        error:function(){
+            alert("unsuccess");
+        }
+
+    })
+});
+
+
+</script>
+</html>

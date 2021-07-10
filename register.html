@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>     
+    <title>Register</title>
+
+    <style>
+        .button { /* Green */
+          border: none;
+          color: white;
+          padding: 8px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          margin: 0px 1px;
+          cursor: pointer;
+        }
+
+        #b{
+            background-color: #1c5a9a;
+            color: white;
+        }
+
+        img {
+            border-radius: 4px;
+            padding: 20px;
+            width: 400px;
+}
+        </style>
+
+
+</head>
+<body>
+    <div class="container col-lg-4">
+    <h2 class="text-center font-weight-bold"><img src="Images/reg.png" /></h2>
+    <form action="" id="registerForm" class="pt-4">
+
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="User Name" name="userName" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="email" class="form-control" placeholder="Email" name="userEmail" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="Password" name="password" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="Confirm Password" name="confirmPassword" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" class="form-control" id="b" value="Register">
+        </div>
+    </form>
+
+</div>
+</body>
+<script>    
+  $('#registerForm').submit(function(e){
+
+    e.preventDefault();
+    
+      var name = $("input[name = userName]").val();
+      var email = $("input[name = userEmail]").val();
+      var password = $("input[name = password]").val();
+      var confirm_password  = $("input[name = confirmPassword]").val();
+
+      $.ajax({
+          type:"POST",
+          //url : "http://127.0.0.1:8000/api/register",
+          url:"http://192.168.1.6:8280/user/register",
+          dataType : "json",
+          data: {
+              name:name,
+              email:email,
+              password:password,
+              password_confirmation : confirm_password
+          },
+          success: function(response){
+            localStorage.setItem("token", response.token);
+            localStorage.setItem("user_id" , response.user.id);
+            localStorage.setItem("user_name" , response.user.name);
+            alert("Your Registered !");
+            window.location.href = "index.html";
+          },
+          error: function(){
+              alert("Something went wrong ! ");
+          }
+      })
+  });
+</script>
+</html> 

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">   
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <!-- <input type="button" value="logout" onclick=logout()> -->
+        <input type="button" onclick="logout()" value="Log Out">
+    </div>
+    
+    <center><h1>Add a Product</h1> <hr>
+
+    <div class="container col-lg-4">
+    <form action="#" id = "addProductForm">
+        
+        <input type="text" name="productName" id="pName" placeholder="Product Name" required><br/><br/>
+
+        <input type="text" name="productSlug" id="pSlug" placeholder="Product Slug" required><br/><br/>
+
+        <input type="text" name="productDescription" id="pDesc" placeholder="Product Description" required><br/><br/>
+
+        <input type="text" name="productPrice" id="pPrice" placeholder="Product Price" required><br/><br/>
+
+        <input type="submit" value="Submit">
+    </form> 
+</div>
+
+    <br>
+
+    <h1>List All Products</h1><hr>
+    <form action="" id="getItemListForm">
+        <br/><input type="submit" value="List All" >
+    </form>
+    <table border='1' id='userTable' style='border-collapse: collapse;'>
+        <thead>
+         <tr>
+           <th>ID</th>
+           <th>name</th>
+           <th>slug</th>
+           <th>desc</th>
+           <th>price</th>
+           <th>action</th>
+         </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </center>
+
+    <div id="itemList">
+
+    </div>
+
+    <div>
+        <form id="updateForm">
+
+        </form>
+    </div>
+
+   
+</body>
+
+<script>
+    $('#addProductForm').submit(function(e){
+        e.preventDefault();
+
+        var productName = $("input[name = productName]").val();
+        var productSlug = $("input[name = productSlug]").val();
+        var productDescription = $("input[name = productDescription]").val();
+        var productPrice = $("input[name = productPrice]").val();
+        var user_id =  localStorage.getItem('user_id');
+        $.ajax({
+            type: "POST",
+            //url: "http://192.168.1.6:8280/user/products",
+            url: "http://127.0.0.1:8000/api/products",
+            headers: {
+	            Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            data: {
+                name: productName,
+                user_id : user_id,
+                slug: productSlug,
+                description: productDescription,
+                price: productPrice
+            },
+            // jsonpCallback: "onJSONPLoad",
+		    // dataType: "json",
+            success: function(){
+                alert("Success");
+                location.reload();
+            },
+            error: function(data){
+                alert("Unsuccess");
+                console.log(data);
+               
+            }
+        });
+    });
+
+    $('#getItemListForm').submit(function(e){
+        e.preventDefault();
+        var user_id = localStorage.getItem('user_id');
+        $.ajax({
+            type:"POST",
+            //url: "http://192.168.1.6:8280/user/products-user",
+            url: "http://127.0.0.1:8000/api/products-user",
+            headers: {
+	            Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            data : {
+                user_id : user_id
+            },
+            jsonpCallback: "onJSONPLoad",
+		    dataType: "json",
+            success: function(response){
+                alert("data retrieved");
+                
+                response.forEach((i) => {
+                    
+                var result_str = "<tr>" +
+                    "<td id='itemId' align = 'center'>" + i.id + "</td>" + 
+                    "<td id='itemName' align = 'center'>" + i.name + "</td>" + 
+                    "<td align = 'center'>" + i.slug + "</td>" +
+                    "<td align = 'center'>" + i.description + "</td>" + 
+                    "<td align = 'center'>" + i.price + "</td>" +
+                    "<td align = 'center'><form id ='deleteRecordForm'><input type='button' value='delete' onclick='deleteFunc(" +i.id + ")'></form><input type='button' value='update' onclick='getOneItem("+i.id+")'></td>"
+                "</tr>";  
+                $('#userTable tbody').append(result_str);
+                });
+
+            },
+            error:function(data){
+                alert("unsuccess");
+                console.log(data);
+            }
+        });
+    });
+
+    function deleteFunc(id){
+        $.ajax({
+            type:"DELETE",
+            //url: "http://192.168.1.6:8280/user/products/" + id ,
+            url: "http://127.0.0.1:8000/api/products/" + id ,
+            headers: {
+	            Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            data:{
+                id:id
+            },
+            success: function(){
+                alert("record deleted");
+                location.reload();
+            }
+        });
+    }
+
+    function getOneItem(id){
+
+        $.ajax({
+            type:"GET",
+            //url: "http://192.168.1.6:8280/user/products/"
+            url: "http://127.0.0.1:8000/api/products/" + id ,
+            headers: {
+	            Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            success: function(response){
+                var update_form = "<br/><center><h2>Update "+ response.name +"</h2><hr>" + 
+                    "<input type='text' name='uItemName' value='"+ response.name +"'/>" +
+                    "<br/><br/>"+
+
+                    
+                    "<input type='text' name='uItemSlug' value='"+ response.slug +"'/>" +
+                    "<br/><br/>" +
+
+                    
+                    "<input type='text' name='uItemDesc' value='"+ response.description +"'/>" +
+                    "<br/><br/>" +
+
+                    
+                    "<input type='text' name='uItemPrice' value='"+ response.price +"'/>" +
+                    "<br/><br/>" +
+
+                    "<input type='button' value='Update' onclick='updateRecord("+response.id+")'/></center>";
+                
+                $('#updateForm').append(update_form);
+
+            },
+            error: function(data){
+                alert("Something went wrong ! ");
+                console.log(data);
+            }
+        });
+    }
+
+    function updateRecord(id){
+
+        var name = $("input[name = uItemName]").val();
+        var slug = $("input[name = uItemSlug]").val();
+        var description = $("input[name = uItemDesc]").val();
+        var price = $("input[name = uItemPrice]").val();
+
+        $.ajax({
+            type: "PUT",
+            //url: "http://192.168.1.6:8280/user/products/" + id , 
+            url : "http://127.0.0.1:8000/api/products/" + id ,
+            headers: {
+	            Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            dataType: "json",
+            data: {
+                name:name,
+                slug:slug,
+                description:description,
+                price:price
+            },
+            success: function(response){
+                console.log(response);
+                alert("Record has been updated");
+                location.reload();
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+    }
+
+    function logout(){
+        $.ajax({
+            type:"POST",
+            //url: "http://192.168.1.6:8280/user/logout",
+            url: "http://127.0.0.1:8000/api/logout",
+            headers: {
+	            Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+            success: function(response){
+                alert(response.message);
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
+        });
+    }
+
+</script>
+</html>

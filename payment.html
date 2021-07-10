@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+    <title>Do Card Payment</title> 
+</head>
+<body>
+
+    
+    <div class="container col-lg-5">
+        <h2 class="text-center font-weight-bold">Card Payment</h2>
+        <hr style="width:100%;text-align:center;margin-left:0; background-color:darkred; height:3px">
+        <form id="paymentForm" class="pt-3">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phoneNum">Phone Number</label>
+            <input type="text" class="form-control" id="phoneNum" placeholder="Enter Phone Number ( 77******** )" name="phoneNum" maxlength="9" minlength="9" required>
+          </div>
+          <div class="form-group">
+            <label for="name">Card Holder Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Enter Card Holder Name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="cardNum">Card Number</label>
+            <input type="text" class="form-control" id="cardNum" placeholder="Enter Card Number ( 12 Numbers )" name="cardNum" maxlength="12" minlength="12" required>
+          </div>
+          <div class="form-group">
+            <label for="cvv">CVV</label>
+            <input type="text" class="form-control" id="cvv" placeholder="Enter CVV ( 3 Numbers )" name="cvv" maxlength="3" minlength="3" required>
+          </div>
+          <div class="form-group">
+            <label for="amount">Amount</label>
+            <input type="text" class="form-control" id="amount" placeholder="Enter Amount" name="amount" required>
+          </div>
+          <button type="submit" class="btn btn-success" id="add"> Confirm Payment </button>
+          <button type="reset" class="btn btn-warning" id="clear">Clear</button>
+        </form>
+        <br/>
+      </div>
+
+
+
+
+<script>
+
+/**
+ * POST method used
+ * add details using request in ajax
+ **/
+$('#paymentForm').submit(function(e){
+    e.preventDefault();
+    
+    //identify all input fields
+    var email = $("input[name = email]").val();
+    var phoneNum = $("input[name = phoneNum]").val();
+    var name = $("input[name = name]").val();
+    var cardNum = $("input[name = cardNum]").val();
+    var cvv = $("input[name = cvv]").val();
+    var amount = $("input[name = amount]").val();
+    $.ajax({
+        type: "POST",
+        //url: "http://127.0.0.1:8020/api/add",
+        url: "http://192.168.1.6:8280/payment/add",
+        data: {
+            email : email,
+            phoneNum : phoneNum,
+            name : name,
+            cardNum : cardNum,
+            cvv : cvv,
+            amount : amount
+        },
+        jsonpCallback: "onJSONPLoad",
+        dataType: "json",
+        success: function(){
+            alert("Payment Success");
+            window.location.href = "delivery_service.html";
+        },
+        error: function(){
+            alert("Payment Unsuccess");
+        }
+    });
+});
+
+</script> 
+    
+</body>
+</html>

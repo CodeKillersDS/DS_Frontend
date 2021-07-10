@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>      
+    <title>'Delivery Service'</title>
+
+    <style>
+        .button { /* Green */
+          border: none;
+          color: white;
+          padding: 8px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          margin: 0px 1px;
+          cursor: pointer;
+        }
+
+        #b{
+            background-color: #1c5a9a;
+            color: white;
+        }
+        </style>
+
+</head>
+<body>  
+
+    <div class="container col-lg-4">
+        <h2 class="text-center font-weight-bold"><img src="Images/delevery.jpg" /></h2>
+        <form action="" id="deliverDetails" class="pt-4">
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="firstName" placeholder="First Name" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="lastName" placeholder="Last Name" required/>
+        </div>  
+        
+        <div class="form-group">
+            <input type="text" class="form-control" name="email" placeholder="Email" required/>
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="address" placeholder="Address"/>
+        </div>
+
+        <div class="form-group">
+            <input type="tel" id="phone" name="phone"  class="form-control" pattern="[0-9]{10}" placeholder="Phone Number" required/>
+        </div>
+        
+        <div class="form-group">
+            <input type="button" value="Submit" class="form-control" id="b" onclick="sendDetails()">
+        </div>
+        </form>
+    </div>
+
+       
+
+        <div id="orderDetails"></div>
+</body>
+<script>
+    function sendDetails(){
+        var fname = $('input[name = firstName]').val();
+        var lname = $('input[name = lastName]').val();
+        var email = $('input[name = email]').val();
+        var address = $('input[name = address]').val();
+        var phone = $('input[name = phone]').val();
+
+        $.ajax({
+            type: "POST",
+            //url : "http://127.0.0.1:8020/api/delivery-order",
+            url : "http://192.168.1.6:8280/delievery/delivery-order",
+            data:{
+                fname:fname,
+                lname:lname,
+                email:email,
+                address:address,
+                phone : phone
+            },
+            dataType: 'json',
+            success: function(response){
+                alert("success");
+                var response_str = "<center><h2>Delivery Request</h2><hr>" + 
+                    "<p> First name : " + response.fname + "</p><br/>" + 
+                    "<p> Last name : " + response.lname + "</p><br/>" + 
+                    "<p> email name : " + response.email + "</p><br/>" + 
+                    "<p> address name : " + response.address + "</p><br/>" + 
+                    "<input type='button' id='deleteButton' value='delete' onclick='deleteFunc("+response.id+")'>";
+                $('#orderDetails').append(response_str);
+                console.log(response);
+                disbtn();
+            },
+            error: function(response){
+                console.log(response);
+            }
+        })
+    }
+
+    // function disbtn(){
+    //     setTimeout(()=>{
+    //         document.getElementById("deleteButton").style.display = "none"
+    //     }, 2000);
+    // }
+
+    function deleteFunc(id){
+       $.ajax({
+           type:"DELETE",
+           //url : "http://127.0.0.1:8020/api/delivery-order" + id,
+           url: "http://192.168.1.6:8280/delievery/delivery-order/" + id,
+           success: function(){
+               alert("Record has been deleted");
+           },
+           error: function(){
+               alert("Something went wrong");
+           }
+       });
+    }
+</script>
+</html>
